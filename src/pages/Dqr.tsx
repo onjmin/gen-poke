@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, memo, ChangeEvent } from 'react';
+import { useState, useRef, useCallback, memo, type ChangeEvent } from 'react';
 import { 
   Download, 
   RotateCcw, 
@@ -7,7 +7,7 @@ import {
   Move, 
   Maximize, 
   Layers,
-  LucideIcon
+  type LucideIcon
 } from 'lucide-react';
 
 // --- 型定義 ---
