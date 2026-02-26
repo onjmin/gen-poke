@@ -60,7 +60,7 @@ const ControlSlider = memo(({ label, value, min, max, step, onChange, icon: Icon
       max={max} 
       step={step} 
       value={value} 
-      onInput={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => onChange(e.target.value)}
       className="w-full h-1.5 bg-gray-100/10 rounded-lg appearance-none cursor-pointer accent-yellow-500 hover:bg-gray-100/20 transition-all"
     />
   </div>
