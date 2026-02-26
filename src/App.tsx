@@ -11,7 +11,7 @@ import {
 	Zap,
 	ZoomIn,
 } from "lucide-react";
-import React, { useState } from "react";
+import { type ChangeEvent, useState } from "react"; // Reactを削除し、useStateと型をimport
 
 // エネルギータイプの定義
 const ENERGY_TYPES = {
@@ -24,23 +24,35 @@ const ENERGY_TYPES = {
 	DARKNESS: { name: "悪", color: "#778899", emoji: ":DARKNESS:" },
 	METAL: { name: "鋼", color: "#99aabb", emoji: ":METAL:" },
 	COLORLESS: { name: "無", color: "#dde0e2", emoji: ":COLORLESS:" },
-};
+} as const; // as const を追加して型を固定
 
-// 闘タイプの拳アイコン（SVG）
-const FistIcon = ({ size = 18 }) => (
+type EnergyType = keyof typeof ENERGY_TYPES;
+
+const FistIcon = ({ size = 18 }: { size?: number }) => (
 	<svg
 		width={size}
 		height={size}
 		viewBox="0 0 24 24"
 		fill="currentColor"
 		xmlns="http://www.w3.org/2000/svg"
+		role="img"
+		aria-labelledby="fist-icon-title"
 	>
+		<title id="fist-icon-title">闘タイプアイコン</title>
 		<path d="M7 11.5V6.5C7 5.67 7.67 5 8.5 5C9.33 5 10 5.67 10 6.5V10.5M10 10.5V5.5C10 4.67 10.67 4 11.5 4C12.33 4 13 4.67 13 5.5V10.5M13 10.5V6.5C13 5.67 13.67 5 14.5 5C15.33 5 16 5.67 16 6.5V11.5M16 11.5V9.5C16 8.67 16.67 8 17.5 8C18.33 8 19 8.67 19 9.5V15.5C19 19.09 16.09 22 12.5 22C8.91 22 6 19.09 6 15.5V11.5H7ZM18 11.5V15.5C18 18.54 15.54 21 12.5 21C9.46 21 7 18.54 7 15.5V12.5H16.5C17.33 12.5 18 11.83 18 11V11.5Z" />
 	</svg>
 );
 
-const EnergyIcon = ({ type, size = 16, shadow = true }) => {
-	const config = ENERGY_TYPES[type] || ENERGY_TYPES.COLORLESS;
+const EnergyIcon = ({
+	type,
+	size = 16,
+	shadow = true,
+}: {
+	type: string;
+	size?: number;
+	shadow?: boolean;
+}) => {
+	const config = ENERGY_TYPES[type as EnergyType] || ENERGY_TYPES.COLORLESS;
 	return (
 		<span
 			className="rounded-full flex items-center justify-center inline-flex align-middle"
@@ -68,11 +80,14 @@ const EnergyIcon = ({ type, size = 16, shadow = true }) => {
 	);
 };
 
-const renderTextWithIcons = (text) => {
+const renderTextWithIcons = (text: string) => {
 	if (!text) return null;
 	const parts = text.split(/(:[A-Z]+:)/g);
 	return parts.map((part, i) => {
-		const typeKey = Object.keys(ENERGY_TYPES).find((key) => ENERGY_TYPES[key].emoji === part);
+		const typeKey = Object.keys(ENERGY_TYPES).find(
+			(key) => ENERGY_TYPES[key as EnergyType].emoji === part,
+		) as EnergyType | undefined;
+
 		if (typeKey) {
 			return (
 				<span key={i} className="mx-0.5">
@@ -85,10 +100,11 @@ const renderTextWithIcons = (text) => {
 };
 
 const App = () => {
+	// --- ここからステータスの型定義 ---
 	const [cardData, setCardData] = useState({
 		name: "アルセウス",
 		hp: "140",
-		type: "COLORLESS",
+		type: "COLORLESS" as string,
 		stage: "たね",
 		isEx: true,
 		isRare: true,
@@ -96,9 +112,9 @@ const App = () => {
 		hasAbility: true,
 		abilityName: "しんわのかがやき",
 		abilityDesc: "このポケモンは特殊状態にならない。",
-		preEvoImage: null,
-		bgImage: null,
-		artImage: null,
+		preEvoImage: null as string | null,
+		bgImage: null as string | null,
+		artImage: null as string | null,
 		bgPos: { x: 50, y: 50, scale: 100 },
 		artPos: { x: 50, y: 50, scale: 100 },
 		attacks: [
@@ -107,10 +123,10 @@ const App = () => {
 				name: "アルティメットフォース",
 				damage: "70+",
 				description: "自分のベンチポケモンの数×20ダメージ追加。",
-				energy: ["COLORLESS", "COLORLESS", "COLORLESS"],
+				energy: ["COLORLESS", "COLORLESS", "COLORLESS"] as string[],
 			},
 		],
-		weakness: "FIGHTING",
+		weakness: "FIGHTING" as string,
 		retreat: 2,
 		baseColor: "#1a1a1a",
 		subColor: "#666666",
@@ -119,18 +135,21 @@ const App = () => {
 
 	const [activeLayer, setActiveLayer] = useState("art");
 
-	const handleImageUpload = (e, target) => {
-		const file = e.target.files[0];
+	const handleImageUpload = (e: ChangeEvent<HTMLInputElement>, target: string) => {
+		const file = e.target.files?.[0];
 		if (file) {
 			const reader = new FileReader();
-			reader.onload = () => setCardData((prev) => ({ ...prev, [target]: reader.result }));
+			reader.onload = () => setCardData((prev) => ({ ...prev, [target]: reader.result as string }));
 			reader.readAsDataURL(file);
 		}
 	};
 
-	const updatePos = (key, val) => {
+	const updatePos = (key: string, val: number) => {
 		const layerKey = activeLayer === "art" ? "artPos" : "bgPos";
-		setCardData((prev) => ({ ...prev, [layerKey]: { ...prev[layerKey], [key]: val } }));
+		setCardData((prev) => ({
+			...prev,
+			[layerKey]: { ...prev[layerKey as "artPos" | "bgPos"], [key]: val },
+		}));
 	};
 
 	return (
