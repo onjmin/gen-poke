@@ -10,7 +10,8 @@ export default function App() {
 		<div className="h-screen flex flex-col bg-[#1a1a1a] text-white p-4 overflow-hidden">
 			{/* --- タイトルセクション（控えめな1行） --- */}
 			<header className="text-center mb-4 flex-shrink-0">
-				<h1 className="text-sm font-bold tracking-widest text-gray-500 uppercase">
+				<h1 className="text-sm font-bold tracking-widest text-gray-500 uppercase flex items-center justify-center gap-2">
+					<img src="pikachu.png" alt="icon" className="w-5 h-5 object-contain" />
 					ポケポケカードジェネレーター
 				</h1>
 			</header>
