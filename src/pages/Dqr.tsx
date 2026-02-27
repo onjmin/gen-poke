@@ -172,7 +172,7 @@ const Dqr = () => {
             }}
           />
 
-          <div className="absolute top-[0px] left-[2px] w-[85px] h-[85px] z-30 flex items-center justify-center">
+          <div className="absolute top-[-1px] left-[2px] w-[85px] h-[85px] z-30 flex items-center justify-center">
             <span className="text-white text-[58px] font-black tracking-tighter stat-font black-outline">{cardData.cost}</span>
           </div>
 
@@ -193,10 +193,10 @@ const Dqr = () => {
               <div className="absolute left-0 w-full z-30 flex justify-center bottom-[31px]">
                 <span className="text-white text-[14px] font-bold tracking-tight tribe-outline">{cardData.tribe}</span>
               </div>
-              <div className="absolute bottom-[6px] left-[6px] w-[75px] h-[75px] z-30 flex items-center justify-center">
+              <div className="absolute bottom-[7px] left-[5px] w-[75px] h-[75px] z-30 flex items-center justify-center">
                 <span className="text-white text-[52px] font-black tracking-tighter stat-font black-outline">{cardData.attack}</span>
               </div>
-              <div className="absolute bottom-[8px] right-[8px] w-[75px] h-[75px] z-30 flex items-center justify-center">
+              <div className="absolute bottom-[7px] right-[10px] w-[75px] h-[75px] z-30 flex items-center justify-center">
                 <span className="text-white text-[52px] font-black tracking-tighter stat-font black-outline">{cardData.hp}</span>
               </div>
             </>
@@ -289,7 +289,16 @@ const Dqr = () => {
         @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@700;800;900&family=Oswald:wght@700&display=swap');
         .card-font { font-family: 'M PLUS Rounded 1c', sans-serif; }
         .stat-font { font-family: 'Oswald', sans-serif; transform: scaleY(1.02); display: inline-block; }
-        .black-outline { paint-order: stroke fill; -webkit-text-stroke: 6px #000000; text-shadow: 2px 2px 0 #000, -2px 2px 0 #000, 2px -2px 0 #000, -2px -2px 0 #000; }
+        .black-outline {
+        paint-order: stroke fill;
+        -webkit-text-stroke: 6px #000000;
+        text-shadow:
+            0 1px 0 #000,
+            -0.5px 2px 0 #000, 0 2px 0 #000, 0.5px 2px 0 #000,
+            -1px 3px 0 #000,   0 3px 0 #000, 1px 3px 0 #000,
+            -1.5px 4px 0 #000, 0 4px 0 #000, 1.5px 4px 0 #000,
+            -2px 5px 0 #000,   0 5px 0 #000, 2px 5px 0 #000;
+        }
         .name-outline { paint-order: stroke fill; -webkit-text-stroke: 3.5px #000000; text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000; }
         .tribe-outline { paint-order: stroke fill; -webkit-text-stroke: 2.5px #000000; text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000; }
         .scrollbar-thin::-webkit-scrollbar { width: 4px; }
