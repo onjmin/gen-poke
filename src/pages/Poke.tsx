@@ -153,12 +153,12 @@ const App = () => {
 	};
 
 	return (
-		<div className="h-screen bg-slate-950 flex flex-col md:flex-row p-4 md:p-8 gap-8 items-start justify-center font-sans overflow-hidden">
+		<div className="flex flex-wrap md:flex-nowrap min-h-[100dvh] md:h-full bg-[#0f1115] overflow-auto font-sans text-white rounded-lg">
 			{/* プレビューエリア */}
-			<div className="w-full max-w-[380px] flex-shrink-0 mx-auto lg:sticky lg:top-0">
+			<div className="w-full md:flex-1 flex flex-col items-center justify-center p-6 bg-black/20 overflow-auto">
 				<div
 					id="card-preview"
-					className="relative aspect-[1/1.4] w-full rounded-[2.2rem] overflow-hidden shadow-2xl select-none"
+					className="relative aspect-[1/1.4] w-full max-w-[380px] rounded-[2.2rem] overflow-hidden shadow-2xl select-none shrink-0"
 					style={{ backgroundColor: cardData.cardBgColor }}
 				>
 					{/* 背景テクスチャ */}
@@ -399,379 +399,387 @@ const App = () => {
 			</div>
 
 			{/* 設定パネル */}
-			<div className="flex-1 w-full max-w-[500px] h-full overflow-y-auto pr-2 space-y-6 pb-24 no-print text-white scrollbar-thin scrollbar-thumb-gray-100/20">
-				{/* イラスト操作セクション */}
-				<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
-					<div className="flex justify-between items-center">
-						<h2 className="text-lg font-bold flex items-center gap-2 text-white">
-							<ImageIcon size={20} /> イラスト操作
-						</h2>
-						<div className="flex gap-4">
-							<label className="flex items-center gap-2 cursor-pointer bg-gray-100/10 px-3 py-1 rounded-full border border-white/5 hover:bg-gray-100/20 transition-colors">
+			<div className="w-full md:w-[450px] border-l border-white/5 bg-[#161920] flex flex-col h-full shadow-2xl">
+				<div className="p-6 flex items-center justify-between border-b border-white/5 bg-gray-100/5">
+					<h1 className="text-lg font-black tracking-tight flex items-center gap-2">
+						<ImageIcon className="text-blue-500" size={20} /> CARD EDITOR
+					</h1>
+				</div>
+
+				<div className="flex-1 overflow-y-auto p-6 space-y-6 scrollbar-thin">
+					{/* イラスト操作セクション */}
+					<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
+						<div className="flex justify-between items-center">
+							<h2 className="text-lg font-bold flex items-center gap-2 text-white">
+								<ImageIcon size={20} /> イラスト操作
+							</h2>
+							<div className="flex gap-4">
+								<label className="flex items-center gap-2 cursor-pointer bg-gray-100/10 px-3 py-1 rounded-full border border-white/5 hover:bg-gray-100/20 transition-colors">
+									<input
+										type="checkbox"
+										checked={cardData.isRare}
+										onChange={(e) => setCardData({ ...cardData, isRare: e.target.checked })}
+										className="w-4 h-4 rounded"
+									/>
+									<span className="text-xs font-bold text-white">レア枠</span>
+								</label>
+							</div>
+						</div>
+						<div className="flex gap-2 p-1 bg-black/20 rounded-2xl">
+							{["art", "bg", "pre"].map((layer) => (
+								<button
+									key={layer}
+									onClick={() => setActiveLayer(layer)}
+									className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${activeLayer === layer ? "bg-blue-600 shadow-lg text-white" : "text-gray-500 hover:bg-gray-100/10"}`}
+								>
+									{layer === "art" ? "メイン" : layer === "bg" ? "背景" : "進化前"}
+								</button>
+							))}
+						</div>
+						<input
+							type="file"
+							accept="image/*"
+							onChange={(e) =>
+								handleImageUpload(
+									e,
+									activeLayer === "art"
+										? "artImage"
+										: activeLayer === "bg"
+											? "bgImage"
+											: "preEvoImage",
+								)
+							}
+							className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white cursor-pointer"
+						/>
+
+						{activeLayer !== "pre" && (
+							<div className="grid grid-cols-1 gap-4">
+								<div className="flex items-center gap-4 bg-black/20 p-3 rounded-xl">
+									<ZoomIn size={16} className="text-gray-500" />
+									<input
+										type="range"
+										min="10"
+										max="800"
+										value={activeLayer === "art" ? cardData.artPos.scale : cardData.bgPos.scale}
+										onChange={(e) => updatePos("scale", Number(e.target.value))}
+										className="flex-1 accent-blue-600"
+									/>
+								</div>
+								<div className="grid grid-cols-2 gap-2">
+									<div className="bg-black/20 p-3 rounded-xl space-y-2">
+										<span className="text-[10px] font-bold text-gray-500 uppercase">X 位置</span>
+										<input
+											type="range"
+											min="0"
+											max="100"
+											value={activeLayer === "art" ? cardData.artPos.x : cardData.bgPos.x}
+											onChange={(e) => updatePos("x", Number(e.target.value))}
+											className="w-full accent-blue-600"
+										/>
+									</div>
+									<div className="bg-black/20 p-3 rounded-xl space-y-2">
+										<span className="text-[10px] font-bold text-gray-500 uppercase">Y 位置</span>
+										<input
+											type="range"
+											min="0"
+											max="100"
+											value={activeLayer === "art" ? cardData.artPos.y : cardData.bgPos.y}
+											onChange={(e) => updatePos("y", Number(e.target.value))}
+											className="w-full accent-blue-600"
+										/>
+									</div>
+								</div>
+							</div>
+						)}
+					</section>
+
+					{/* 基本情報セクション */}
+					<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
+						<div className="flex justify-between items-center">
+							<h2 className="text-lg font-bold text-white">基本情報</h2>
+							<label className="flex items-center gap-2 cursor-pointer text-blue-400">
 								<input
 									type="checkbox"
-									checked={cardData.isRare}
-									onChange={(e) => setCardData({ ...cardData, isRare: e.target.checked })}
-									className="w-4 h-4 rounded"
+									checked={cardData.isEx}
+									onChange={(e) => setCardData({ ...cardData, isEx: e.target.checked })}
+									className="w-4 h-4"
 								/>
-								<span className="text-xs font-bold text-white">レア枠</span>
+								<span className="text-sm font-black italic">ex化</span>
 							</label>
 						</div>
-					</div>
-					<div className="flex gap-2 p-1 bg-black/20 rounded-2xl">
-						{["art", "bg", "pre"].map((layer) => (
+						<div className="grid grid-cols-2 gap-4">
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">ポケモン名</label>
+								<input
+									type="text"
+									value={cardData.name}
+									onChange={(e) => setCardData({ ...cardData, name: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
+								/>
+							</div>
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">HP</label>
+								<input
+									type="number"
+									value={cardData.hp}
+									onChange={(e) => setCardData({ ...cardData, hp: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
+								/>
+							</div>
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">タイプ</label>
+								<select
+									value={cardData.type}
+									onChange={(e) => setCardData({ ...cardData, type: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
+								>
+									{Object.entries(ENERGY_TYPES).map(([k, v]) => (
+										<option key={k} value={k} className="bg-white text-black">
+											{v.name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">進化段階</label>
+								<select
+									value={cardData.stage}
+									onChange={(e) => setCardData({ ...cardData, stage: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
+								>
+									<option value="たね" className="bg-white text-black">
+										たね
+									</option>
+									<option value="1進化" className="bg-white text-black">
+										1進化
+									</option>
+									<option value="2進化" className="bg-white text-black">
+										2進化
+									</option>
+								</select>
+							</div>
+						</div>
+
+						<div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5 mt-2">
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">
+									レアリティ (ダイヤ数)
+								</label>
+								<input
+									type="range"
+									min="1"
+									max="5"
+									value={cardData.rarity}
+									onChange={(e) => setCardData({ ...cardData, rarity: Number(e.target.value) })}
+									className="w-full accent-blue-600"
+								/>
+							</div>
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">地の色 (背景色)</label>
+								<div className="flex items-center gap-2 bg-gray-100/10 rounded-xl px-3 py-1.5 h-[42px]">
+									<input
+										type="color"
+										value={cardData.cardBgColor}
+										onChange={(e) => setCardData({ ...cardData, cardBgColor: e.target.value })}
+										className="w-8 h-8 bg-transparent border-0 cursor-pointer rounded overflow-hidden"
+									/>
+									<span className="text-xs font-mono uppercase text-gray-400">
+										{cardData.cardBgColor}
+									</span>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					{/* 弱点・にげる設定セクション（新規追加） */}
+					<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
+						<h2 className="text-lg font-bold text-white">ステータス詳細</h2>
+						<div className="grid grid-cols-2 gap-4">
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">じゃくてん</label>
+								<select
+									value={cardData.weakness}
+									onChange={(e) => setCardData({ ...cardData, weakness: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
+								>
+									{Object.entries(ENERGY_TYPES).map(([k, v]) => (
+										<option key={k} value={k} className="bg-white text-black">
+											{v.name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className="space-y-1">
+								<label className="text-[10px] font-bold text-gray-500 ml-2">にげるエネルギー</label>
+								<div className="flex items-center gap-4 bg-gray-100/10 p-2.5 rounded-xl">
+									<input
+										type="range"
+										min="0"
+										max="4"
+										value={cardData.retreat}
+										onChange={(e) => setCardData({ ...cardData, retreat: Number(e.target.value) })}
+										className="flex-1 accent-blue-600"
+									/>
+									<span className="text-sm font-bold w-4 text-center">{cardData.retreat}</span>
+								</div>
+							</div>
+						</div>
+					</section>
+
+					{/* わざ・特性セクション */}
+					<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
+						<div className="flex justify-between items-center border-b border-white/5 pb-2">
+							<h2 className="text-lg font-bold">わざ・特性</h2>
 							<button
-								key={layer}
-								onClick={() => setActiveLayer(layer)}
-								className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${activeLayer === layer ? "bg-blue-600 shadow-lg text-white" : "text-gray-500 hover:bg-gray-100/10"}`}
+								onClick={() => setCardData({ ...cardData, hasAbility: !cardData.hasAbility })}
+								className={`px-4 py-1 rounded-full text-[10px] font-black tracking-widest transition-all ${cardData.hasAbility ? "bg-red-600 text-white" : "bg-gray-100/10 text-gray-500 hover:bg-gray-100/20"}`}
 							>
-								{layer === "art" ? "メイン" : layer === "bg" ? "背景" : "進化前"}
+								特性 {cardData.hasAbility ? "ON" : "OFF"}
 							</button>
+						</div>
+
+						{cardData.hasAbility && (
+							<div className="space-y-3 p-4 bg-red-600/5 rounded-2xl border border-red-600/10">
+								<input
+									type="text"
+									placeholder="特性の名前"
+									value={cardData.abilityName}
+									onChange={(e) => setCardData({ ...cardData, abilityName: e.target.value })}
+									className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2 text-sm text-white focus:ring-1 focus:ring-red-500"
+								/>
+								<textarea
+									placeholder="説明文"
+									value={cardData.abilityDesc}
+									onChange={(e) => setCardData({ ...cardData, abilityDesc: e.target.value })}
+									className="w-full h-16 bg-gray-100/10 border-0 rounded-xl px-4 py-2 text-xs text-white resize-none focus:ring-1 focus:ring-red-500"
+								/>
+							</div>
+						)}
+
+						{cardData.attacks.map((atk) => (
+							<div
+								key={atk.id}
+								className="p-4 bg-gray-100/10 rounded-2xl border border-gray-100/10 relative space-y-3"
+							>
+								<button
+									onClick={() =>
+										setCardData({
+											...cardData,
+											attacks: cardData.attacks.filter((a) => a.id !== atk.id),
+										})
+									}
+									className="absolute top-2 right-2 text-gray-500 hover:text-red-400"
+								>
+									<Trash2 size={16} />
+								</button>
+								<div className="grid grid-cols-4 gap-2">
+									<input
+										type="text"
+										placeholder="わざ名"
+										value={atk.name}
+										onChange={(e) =>
+											setCardData({
+												...cardData,
+												attacks: cardData.attacks.map((a) =>
+													a.id === atk.id ? { ...a, name: e.target.value } : a,
+												),
+											})
+										}
+										className="col-span-3 bg-gray-100/10 border-0 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
+									/>
+									<input
+										type="text"
+										placeholder="ダメージ"
+										value={atk.damage}
+										onChange={(e) =>
+											setCardData({
+												...cardData,
+												attacks: cardData.attacks.map((a) =>
+													a.id === atk.id ? { ...a, damage: e.target.value } : a,
+												),
+											})
+										}
+										className="bg-gray-100/10 border-0 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
+									/>
+								</div>
+								<div className="flex gap-1.5 p-2 bg-black/10 rounded-xl flex-wrap">
+									{atk.energy.map((e, i) => (
+										<button
+											key={i}
+											onClick={() => {
+												const n = [...atk.energy];
+												n.splice(i, 1);
+												setCardData({
+													...cardData,
+													attacks: cardData.attacks.map((a) =>
+														a.id === atk.id ? { ...a, energy: n } : a,
+													),
+												});
+											}}
+											className="hover:opacity-50 transition-opacity"
+										>
+											<EnergyIcon type={e} size={20} />
+										</button>
+									))}
+									<div className="h-6 w-px bg-white/10 mx-1" />
+									{Object.keys(ENERGY_TYPES).map((t) => (
+										<button
+											key={t}
+											onClick={() =>
+												setCardData({
+													...cardData,
+													attacks: cardData.attacks.map((a) =>
+														a.id === atk.id ? { ...a, energy: [...a.energy, t].slice(0, 4) } : a,
+													),
+												})
+											}
+											className="hover:scale-110 transition-transform"
+										>
+											<EnergyIcon type={t} size={16} />
+										</button>
+									))}
+								</div>
+								<textarea
+									placeholder="わざの効果"
+									value={atk.description}
+									onChange={(e) =>
+										setCardData({
+											...cardData,
+											attacks: cardData.attacks.map((a) =>
+												a.id === atk.id ? { ...a, description: e.target.value } : a,
+											),
+										})
+									}
+									className="w-full h-16 bg-gray-100/10 border-0 rounded-lg px-3 py-2 text-xs text-white resize-none focus:ring-1 focus:ring-blue-500"
+								/>
+							</div>
 						))}
-					</div>
-					<input
-						type="file"
-						accept="image/*"
-						onChange={(e) =>
-							handleImageUpload(
-								e,
-								activeLayer === "art"
-									? "artImage"
-									: activeLayer === "bg"
-										? "bgImage"
-										: "preEvoImage",
-							)
-						}
-						className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white cursor-pointer"
-					/>
-
-					{activeLayer !== "pre" && (
-						<div className="grid grid-cols-1 gap-4">
-							<div className="flex items-center gap-4 bg-black/20 p-3 rounded-xl">
-								<ZoomIn size={16} className="text-gray-500" />
-								<input
-									type="range"
-									min="10"
-									max="800"
-									value={activeLayer === "art" ? cardData.artPos.scale : cardData.bgPos.scale}
-									onChange={(e) => updatePos("scale", Number(e.target.value))}
-									className="flex-1 accent-blue-600"
-								/>
-							</div>
-							<div className="grid grid-cols-2 gap-2">
-								<div className="bg-black/20 p-3 rounded-xl space-y-2">
-									<span className="text-[10px] font-bold text-gray-500 uppercase">X 位置</span>
-									<input
-										type="range"
-										min="0"
-										max="100"
-										value={activeLayer === "art" ? cardData.artPos.x : cardData.bgPos.x}
-										onChange={(e) => updatePos("x", Number(e.target.value))}
-										className="w-full accent-blue-600"
-									/>
-								</div>
-								<div className="bg-black/20 p-3 rounded-xl space-y-2">
-									<span className="text-[10px] font-bold text-gray-500 uppercase">Y 位置</span>
-									<input
-										type="range"
-										min="0"
-										max="100"
-										value={activeLayer === "art" ? cardData.artPos.y : cardData.bgPos.y}
-										onChange={(e) => updatePos("y", Number(e.target.value))}
-										className="w-full accent-blue-600"
-									/>
-								</div>
-							</div>
-						</div>
-					)}
-				</section>
-
-				{/* 基本情報セクション */}
-				<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
-					<div className="flex justify-between items-center">
-						<h2 className="text-lg font-bold text-white">基本情報</h2>
-						<label className="flex items-center gap-2 cursor-pointer text-blue-400">
-							<input
-								type="checkbox"
-								checked={cardData.isEx}
-								onChange={(e) => setCardData({ ...cardData, isEx: e.target.checked })}
-								className="w-4 h-4"
-							/>
-							<span className="text-sm font-black italic">ex化</span>
-						</label>
-					</div>
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">ポケモン名</label>
-							<input
-								type="text"
-								value={cardData.name}
-								onChange={(e) => setCardData({ ...cardData, name: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
-							/>
-						</div>
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">HP</label>
-							<input
-								type="number"
-								value={cardData.hp}
-								onChange={(e) => setCardData({ ...cardData, hp: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
-							/>
-						</div>
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">タイプ</label>
-							<select
-								value={cardData.type}
-								onChange={(e) => setCardData({ ...cardData, type: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
-							>
-								{Object.entries(ENERGY_TYPES).map(([k, v]) => (
-									<option key={k} value={k} className="bg-white text-black">
-										{v.name}
-									</option>
-								))}
-							</select>
-						</div>
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">進化段階</label>
-							<select
-								value={cardData.stage}
-								onChange={(e) => setCardData({ ...cardData, stage: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
-							>
-								<option value="たね" className="bg-white text-black">
-									たね
-								</option>
-								<option value="1進化" className="bg-white text-black">
-									1進化
-								</option>
-								<option value="2進化" className="bg-white text-black">
-									2進化
-								</option>
-							</select>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-2 gap-4 pt-2 border-t border-white/5 mt-2">
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">
-								レアリティ (ダイヤ数)
-							</label>
-							<input
-								type="range"
-								min="1"
-								max="5"
-								value={cardData.rarity}
-								onChange={(e) => setCardData({ ...cardData, rarity: Number(e.target.value) })}
-								className="w-full accent-blue-600"
-							/>
-						</div>
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">地の色 (背景色)</label>
-							<div className="flex items-center gap-2 bg-gray-100/10 rounded-xl px-3 py-1.5 h-[42px]">
-								<input
-									type="color"
-									value={cardData.cardBgColor}
-									onChange={(e) => setCardData({ ...cardData, cardBgColor: e.target.value })}
-									className="w-8 h-8 bg-transparent border-0 cursor-pointer rounded overflow-hidden"
-								/>
-								<span className="text-xs font-mono uppercase text-gray-400">
-									{cardData.cardBgColor}
-								</span>
-							</div>
-						</div>
-					</div>
-				</section>
-
-				{/* 弱点・にげる設定セクション（新規追加） */}
-				<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
-					<h2 className="text-lg font-bold text-white">ステータス詳細</h2>
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">じゃくてん</label>
-							<select
-								value={cardData.weakness}
-								onChange={(e) => setCardData({ ...cardData, weakness: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2.5 text-sm text-white appearance-none cursor-pointer focus:ring-1 focus:ring-blue-500"
-							>
-								{Object.entries(ENERGY_TYPES).map(([k, v]) => (
-									<option key={k} value={k} className="bg-white text-black">
-										{v.name}
-									</option>
-								))}
-							</select>
-						</div>
-						<div className="space-y-1">
-							<label className="text-[10px] font-bold text-gray-500 ml-2">にげるエネルギー</label>
-							<div className="flex items-center gap-4 bg-gray-100/10 p-2.5 rounded-xl">
-								<input
-									type="range"
-									min="0"
-									max="4"
-									value={cardData.retreat}
-									onChange={(e) => setCardData({ ...cardData, retreat: Number(e.target.value) })}
-									className="flex-1 accent-blue-600"
-								/>
-								<span className="text-sm font-bold w-4 text-center">{cardData.retreat}</span>
-							</div>
-						</div>
-					</div>
-				</section>
-
-				{/* わざ・特性セクション */}
-				<section className="bg-gray-100/10 p-6 rounded-3xl border border-gray-100/10 space-y-4">
-					<div className="flex justify-between items-center border-b border-white/5 pb-2">
-						<h2 className="text-lg font-bold">わざ・特性</h2>
-						<button
-							onClick={() => setCardData({ ...cardData, hasAbility: !cardData.hasAbility })}
-							className={`px-4 py-1 rounded-full text-[10px] font-black tracking-widest transition-all ${cardData.hasAbility ? "bg-red-600 text-white" : "bg-gray-100/10 text-gray-500 hover:bg-gray-100/20"}`}
-						>
-							特性 {cardData.hasAbility ? "ON" : "OFF"}
-						</button>
-					</div>
-
-					{cardData.hasAbility && (
-						<div className="space-y-3 p-4 bg-red-600/5 rounded-2xl border border-red-600/10">
-							<input
-								type="text"
-								placeholder="特性の名前"
-								value={cardData.abilityName}
-								onChange={(e) => setCardData({ ...cardData, abilityName: e.target.value })}
-								className="w-full bg-gray-100/10 border-0 rounded-xl px-4 py-2 text-sm text-white focus:ring-1 focus:ring-red-500"
-							/>
-							<textarea
-								placeholder="説明文"
-								value={cardData.abilityDesc}
-								onChange={(e) => setCardData({ ...cardData, abilityDesc: e.target.value })}
-								className="w-full h-16 bg-gray-100/10 border-0 rounded-xl px-4 py-2 text-xs text-white resize-none focus:ring-1 focus:ring-red-500"
-							/>
-						</div>
-					)}
-
-					{cardData.attacks.map((atk) => (
-						<div
-							key={atk.id}
-							className="p-4 bg-gray-100/10 rounded-2xl border border-gray-100/10 relative space-y-3"
-						>
+						{cardData.attacks.length < 2 && (
 							<button
 								onClick={() =>
 									setCardData({
 										...cardData,
-										attacks: cardData.attacks.filter((a) => a.id !== atk.id),
+										attacks: [
+											...cardData.attacks,
+											{ id: Date.now(), name: "", damage: "", description: "", energy: [] },
+										],
 									})
 								}
-								className="absolute top-2 right-2 text-gray-500 hover:text-red-400"
+								className="w-full py-3 border-2 border-dashed border-white/5 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-100/20 flex items-center justify-center gap-2 transition-all"
 							>
-								<Trash2 size={16} />
+								<Plus size={14} /> わざを追加
 							</button>
-							<div className="grid grid-cols-4 gap-2">
-								<input
-									type="text"
-									placeholder="わざ名"
-									value={atk.name}
-									onChange={(e) =>
-										setCardData({
-											...cardData,
-											attacks: cardData.attacks.map((a) =>
-												a.id === atk.id ? { ...a, name: e.target.value } : a,
-											),
-										})
-									}
-									className="col-span-3 bg-gray-100/10 border-0 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
-								/>
-								<input
-									type="text"
-									placeholder="ダメージ"
-									value={atk.damage}
-									onChange={(e) =>
-										setCardData({
-											...cardData,
-											attacks: cardData.attacks.map((a) =>
-												a.id === atk.id ? { ...a, damage: e.target.value } : a,
-											),
-										})
-									}
-									className="bg-gray-100/10 border-0 rounded-lg px-3 py-1.5 text-sm text-white focus:ring-1 focus:ring-blue-500"
-								/>
-							</div>
-							<div className="flex gap-1.5 p-2 bg-black/10 rounded-xl flex-wrap">
-								{atk.energy.map((e, i) => (
-									<button
-										key={i}
-										onClick={() => {
-											const n = [...atk.energy];
-											n.splice(i, 1);
-											setCardData({
-												...cardData,
-												attacks: cardData.attacks.map((a) =>
-													a.id === atk.id ? { ...a, energy: n } : a,
-												),
-											});
-										}}
-										className="hover:opacity-50 transition-opacity"
-									>
-										<EnergyIcon type={e} size={20} />
-									</button>
-								))}
-								<div className="h-6 w-px bg-white/10 mx-1" />
-								{Object.keys(ENERGY_TYPES).map((t) => (
-									<button
-										key={t}
-										onClick={() =>
-											setCardData({
-												...cardData,
-												attacks: cardData.attacks.map((a) =>
-													a.id === atk.id ? { ...a, energy: [...a.energy, t].slice(0, 4) } : a,
-												),
-											})
-										}
-										className="hover:scale-110 transition-transform"
-									>
-										<EnergyIcon type={t} size={16} />
-									</button>
-								))}
-							</div>
-							<textarea
-								placeholder="わざの効果"
-								value={atk.description}
-								onChange={(e) =>
-									setCardData({
-										...cardData,
-										attacks: cardData.attacks.map((a) =>
-											a.id === atk.id ? { ...a, description: e.target.value } : a,
-										),
-									})
-								}
-								className="w-full h-16 bg-gray-100/10 border-0 rounded-lg px-3 py-2 text-xs text-white resize-none focus:ring-1 focus:ring-blue-500"
-							/>
-						</div>
-					))}
-					{cardData.attacks.length < 2 && (
-						<button
-							onClick={() =>
-								setCardData({
-									...cardData,
-									attacks: [
-										...cardData.attacks,
-										{ id: Date.now(), name: "", damage: "", description: "", energy: [] },
-									],
-								})
-							}
-							className="w-full py-3 border-2 border-dashed border-white/5 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-100/20 flex items-center justify-center gap-2 transition-all"
-						>
-							<Plus size={14} /> わざを追加
-						</button>
-					)}
-				</section>
+						)}
+					</section>
 
-				<button
-					onClick={() => window.print()}
-					className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-3xl shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 group"
-				>
-					<Download size={22} className="group-hover:translate-y-0.5 transition-transform" />{" "}
-					カードを保存
-				</button>
+					<button
+						onClick={() => window.print()}
+						className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-3xl shadow-2xl flex items-center justify-center gap-3 transition-all active:scale-95 group"
+					>
+						<Download size={22} className="group-hover:translate-y-0.5 transition-transform" />{" "}
+						カードを保存
+					</button>
+				</div>
 			</div>
 
 			<style>{`
