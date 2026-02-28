@@ -160,9 +160,9 @@ const Dqr = () => {
 	};
 
 	return (
-		<div className="flex h-full bg-[#0f1115] overflow-hidden font-sans text-white rounded-lg">
+		<div className="flex flex-wrap md:flex-nowrap min-h-[100dvh] md:h-full bg-[#0f1115] overflow-auto font-sans text-white rounded-lg">
 			{/* --- カードプレビューエリア --- */}
-			<div className="flex-1 flex flex-col items-center justify-center p-6 bg-black/20 overflow-auto">
+			<div className="w-full md:flex-1 flex flex-col items-center justify-center p-6 bg-black/20 overflow-auto">
 				<div
 					ref={cardRef}
 					className="relative overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.9)] card-font rounded-lg bg-black select-none shrink-0"
@@ -273,7 +273,7 @@ const Dqr = () => {
 				</div>
 			</div>
 
-			<div className="w-[450px] border-l border-white/5 bg-[#161920] flex flex-col h-full shadow-2xl">
+			<div className="w-full md:w-[450px] border-l border-white/5 bg-[#161920] flex flex-col h-full shadow-2xl">
 				<div className="p-6 flex items-center justify-between border-b border-white/5 bg-gray-100/5">
 					<h1 className="text-lg font-black tracking-tight flex items-center gap-2">
 						<Layers className="text-yellow-500" size={20} /> CARD EDITOR

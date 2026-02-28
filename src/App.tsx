@@ -7,7 +7,7 @@ export default function App() {
 	const [activeTab, setActiveTab] = useState<"poke" | "dqr">("poke");
 
 	return (
-		<div className="h-screen flex flex-col bg-[#1a1a1a] text-white p-4 overflow-hidden">
+		<div className="h-screen md:h-screen flex flex-col bg-[#1a1a1a] text-white p-4 overflow-auto md:overflow-hidden">
 			{/* --- タイトルセクション（控えめな1行） --- */}
 			<header className="text-center mb-4 flex-shrink-0">
 				<h1 className="text-sm font-bold tracking-widest text-gray-500 uppercase flex items-center justify-center gap-2">
@@ -46,7 +46,7 @@ export default function App() {
 			</div>
 
 			{/* メインコンテンツエリア */}
-			<main className="flex-1 w-full max-w-6xl mx-auto overflow-hidden">
+			<main className="flex-1 w-full max-w-6xl mx-auto overflow-auto md:overflow-hidden">
 				<div className="h-full animate-in fade-in duration-300">
 					{activeTab === "poke" ? <Poke /> : <Dqr />}
 				</div>
